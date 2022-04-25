@@ -31,7 +31,7 @@ import Plutus.ChainIndex.Config (ChainIndexConfig (cicNetworkId, cicPort), cicDb
 import Plutus.ChainIndex.Config qualified as ChainIndex
 import Plutus.ChainIndex.Logging (defaultConfig)
 import Servant.Client (BaseUrl (BaseUrl), Scheme (Http))
-import System.Directory (copyFile, findExecutable)
+import System.Directory (copyFile, findExecutable, doesPathExist, createDirectory, removePathForcibly)
 import System.Environment (setEnv)
 import System.Exit (die)
 import System.FilePath ((</>))
@@ -52,6 +52,7 @@ import Paths_plutip (getDataFileName)
 import Test.Plutip.Config (PlutipConfig (chainIndexPort, clusterDataDir, relayNodeLogs))
 import Test.Plutip.Config qualified as Config
 import Text.Printf (printf)
+import Control.Monad (when)
 
 -- | Starting a cluster with a setup action
 -- We're heavily depending on cardano-wallet local cluster tooling, however they don't allow the
@@ -160,10 +161,18 @@ withLocalClusterSetup conf action = do
   withUtf8Encoding $
     -- This temporary directory will contain logs, and all other data
     -- produced by the local test cluster.
-    withSystemTempDir stdoutTextTracer "test-cluster" $ \dir -> do
-      let logOutputs name minSev =
+    withSystemTempDir stdoutTextTracer "test-cluster" $ \_ -> do
+      let 
+        dir = "/home/mike/dev/dev-tmp/plutip-cluster"
+        logOutputs name minSev =
             -- cluster logs to file only
             [ LogToFile (dir </> name) (min minSev Severity.Info)]
+      
+      -- handle @SomeException print $ do
+      isThere <- doesPathExist dir
+      when isThere $ do
+          removePathForcibly dir
+          createDirectory dir
 
       clusterLogs <- logOutputs "cluster.log" <$> testMinSeverityFromEnv
       walletLogs <- logOutputs "wallet.log" <$> walletMinSeverityFromEnv
