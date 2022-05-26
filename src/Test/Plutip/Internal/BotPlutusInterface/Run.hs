@@ -106,7 +106,7 @@ runContract cEnv bpiWallet contract = do
         , pcPort = 9080
         , pcEnableTxEndpoint = False
         , pcMetadataDir = Text.pack $ BIS.metadataDir cEnv
-        , pcCollectStats = True
+        , pcCollectStats = False
         }
 
     runContract' :: ContractEnvironment w -> m (ExecutionResult w e a)
