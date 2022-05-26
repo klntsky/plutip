@@ -25,7 +25,6 @@ import BotPlutusInterface.Types (
     pcProtocolParamsFile,
     pcScriptFileDir,
     pcSigningKeyFileDir,
-    pcSlotConfig,
     pcTipPollingInterval,
     pcTxFileDir
   ),
@@ -41,7 +40,6 @@ import Control.Monad (void)
 import Control.Monad.Catch (SomeException)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Aeson (ToJSON, eitherDecodeFileStrict')
-import Data.Default (def)
 import Data.Either.Combinators (fromRight)
 import Data.Kind (Type)
 import Data.Row (Row)
@@ -96,15 +94,13 @@ runContract cEnv bpiWallet contract = do
         , pcChainIndexUrl = chainIndexUrl cEnv
         , pcNetwork = networkId cEnv
         , pcProtocolParams = pparams
-        , pcSlotConfig = def
         , pcScriptFileDir = Text.pack $ BIS.scriptsDir cEnv
         , pcSigningKeyFileDir = Text.pack $ BIS.keysDir cEnv
         , pcTxFileDir = Text.pack $ BIS.txsDir cEnv
         , pcDryRun = False
         , pcProtocolParamsFile = Text.pack $ BIS.pParamsFile cEnv
         , pcLogLevel = Info
-        , -- , pcForceBudget = bpiForceBudget cEnv
-          pcOwnPubKeyHash = walletPkh bpiWallet
+        , pcOwnPubKeyHash = walletPkh bpiWallet
         , pcOwnStakePubKeyHash = Nothing
         , pcTipPollingInterval = 1_000_000
         , pcPort = 9080
